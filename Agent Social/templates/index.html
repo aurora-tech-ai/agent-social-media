@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente de Conteúdo para Redes Sociais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: gradientShift 10s ease infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            50% { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <h1 class="text-5xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-magic text-purple-600"></i>
+                    Agente de Conteúdo Social
+                </h1>
+                <p class="text-xl text-gray-600">Crie posts incríveis com IA para suas redes sociais</p>
+            </div>
+
+            <!-- Main Container -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Input Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h2 class="text-2xl font-semibold mb-6 text-gray-800">
+                        <i class="fas fa-pencil-alt text-purple-500"></i> Criar Post
+                    </h2>
+
+                    <!-- Platform Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Plataforma</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="selectPlatform('instagram')" id="btn-instagram" 
+                                class="platform-btn border-2 border-purple-500 bg-purple-50 text-purple-700 py-3 px-4 rounded-lg transition hover:bg-purple-100">
+                                <i class="fab fa-instagram text-2xl"></i>
+                                <div class="text-xs mt-1">Instagram</div>
+                            </button>
+                            <button onclick="selectPlatform('linkedin')" id="btn-linkedin"
+                                class="platform-btn border-2 border-gray-300 py-3 px-4 rounded-lg transition hover:bg-gray-50">
+                                <i class="fab fa-linkedin text-2xl"></i>
+                                <div class="text-xs mt-1">LinkedIn</div>
+                            </button>
+                            <button onclick="selectPlatform('twitter')" id="btn-twitter"
+                                class="platform-btn border-2 border-gray-300 py-3 px-4 rounded-lg transition hover:bg-gray-50">
+                                <i class="fab fa-twitter text-2xl"></i>
+                                <div class="text-xs mt-1">Twitter</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Input -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descreva seu post</label>
+                        <div class="relative">
+                            <textarea id="prompt" rows="4" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                                placeholder="Ex: post sobre café, promoção black friday, dicas de produtividade..."></textarea>
+                            
+                            <!-- Enhance Button -->
+                            <button onclick="enhancePrompt()" id="enhanceBtn"
+                                class="absolute bottom-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 flex items-center">
+                                <i class="fas fa-magic mr-2"></i>
+                                <span id="enhanceBtnText">Melhorar com IA</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Enhancement Status -->
+                        <div id="enhanceStatus" class="hidden mt-2">
+                            <div class="text-sm text-purple-600 flex items-center">
+                                <i class="fas fa-sparkles mr-1 animate-pulse"></i>
+                                <span>Prompt melhorado com IA</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Prompts / Inspiration -->
+                        <div class="mt-3">
+                            <p class="text-xs text-gray-500 mb-2">Precisa de inspiração? Tente:</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="setQuickPrompt('promoção black friday')" 
+                                    class="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 transition">
+                                    🏷️ Promoção
+                                </button>
+                                <button onclick="setQuickPrompt('dicas de produtividade')" 
+                                    class="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 transition">
+                                    ⚡ Produtividade
+                                </button>
+                                <button onclick="setQuickPrompt('lançamento de produto')" 
+                                    class="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 transition">
+                                    🚀 Lançamento
+                                </button>
+                                <button onclick="setQuickPrompt('frase motivacional')" 
+                                    class="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 transition">
+                                    💪 Motivação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button onclick="generatePost()" id="generateBtn"
+                        class="w-full gradient-bg text-white font-semibold py-4 px-6 rounded-lg transition transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-sparkles mr-2"></i>
+                        <span id="generateBtnText">Gerar Post</span>
+                    </button>
+
+                    <!-- Download Options -->
+                    <div id="downloadOptions" class="hidden mt-6">
+                        <h3 class="text-lg font-medium mb-3 text-gray-700">
+                            <i class="fas fa-download text-green-500"></i> Baixar como:
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="downloadPost('png')" 
+                                class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition">
+                                <i class="fas fa-image"></i> PNG
+                            </button>
+                            <button onclick="downloadPost('jpg')" 
+                                class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition">
+                                <i class="fas fa-image"></i> JPG
+                            </button>
+                            <button onclick="downloadPost('gif')" 
+                                class="bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition">
+                                <i class="fas fa-film"></i> GIF
+                            </button>
+                            <button onclick="downloadPost('mp4')" 
+                                class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition">
+                                <i class="fas fa-video"></i> MP4
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h2 class="text-2xl font-semibold mb-6 text-gray-800">
+                        <i class="fas fa-eye text-blue-500"></i> Preview
+                    </h2>
+                    
+                    <div id="previewContainer" class="relative bg-gray-100 rounded-lg overflow-hidden" 
+                        style="min-height: 400px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-gray-400">
+                            <i class="fas fa-image text-6xl mb-4"></i>
+                            <p>O preview aparecerá aqui</p>
+                        </div>
+                    </div>
+
+                    <!-- Status Messages -->
+                    <div id="statusMessage" class="mt-4 hidden">
+                        <div class="px-4 py-3 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="mt-12 bg-white rounded-2xl shadow-xl p-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">
+                    <i class="fas fa-lightbulb text-yellow-500"></i> Dicas para melhores resultados
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <div>
+                            <strong>Seja específico:</strong> Descreva cores, estilo e elementos visuais desejados
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <div>
+                            <strong>Mencione o público:</strong> Indique para quem é o conteúdo
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <div>
+                            <strong>Inclua CTA:</strong> Peça para incluir call-to-action quando necessário
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPlatform = 'instagram';
+        let currentHtml = '';
+        let currentContentId = '';
+        let isEnhanced = false;
+
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            
+            // Update button styles
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700');
+                btn.classList.add('border-gray-300');
+            });
+            
+            const selectedBtn = document.getElementById(`btn-${platform}`);
+            selectedBtn.classList.remove('border-gray-300');
+            selectedBtn.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700');
+            
+            // Reset enhancement status when platform changes
+            if (isEnhanced) {
+                document.getElementById('enhanceStatus').classList.add('hidden');
+                isEnhanced = false;
+            }
+        }
+
+        function setQuickPrompt(prompt) {
+            document.getElementById('prompt').value = prompt;
+            // Auto-enhance quando usar quick prompt
+            enhancePrompt();
+        }
+
+        async function enhancePrompt() {
+            const promptField = document.getElementById('prompt');
+            const originalPrompt = promptField.value.trim();
+            
+            if (!originalPrompt) {
+                showStatus('Digite algo para melhorar', 'error');
+                return;
+            }
+
+            const enhanceBtn = document.getElementById('enhanceBtn');
+            const enhanceBtnText = document.getElementById('enhanceBtnText');
+            const enhanceStatus = document.getElementById('enhanceStatus');
+            
+            // Show loading state
+            enhanceBtn.disabled = true;
+            enhanceBtnText.innerHTML = '<div class="loading-spinner inline-block mr-2" style="width: 16px; height: 16px; border-width: 2px;"></div> Melhorando...';
+            
+            // Animate textarea
+            promptField.style.opacity = '0.5';
+            
+            try {
+                const response = await fetch('/enhance-prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: originalPrompt,
+                        platform: selectedPlatform
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Smooth transition effect
+                    promptField.style.transition = 'all 0.5s ease';
+                    promptField.style.transform = 'scale(0.98)';
+                    
+                    setTimeout(() => {
+                        promptField.value = data.enhanced_prompt;
+                        promptField.style.opacity = '1';
+                        promptField.style.transform = 'scale(1)';
+                        
+                        // Auto-resize textarea if needed
+                        promptField.style.height = 'auto';
+                        promptField.style.height = Math.min(promptField.scrollHeight, 200) + 'px';
+                        
+                        // Show enhancement status
+                        enhanceStatus.classList.remove('hidden');
+                        isEnhanced = true;
+                        
+                        // Flash effect
+                        promptField.classList.add('ring-2', 'ring-purple-400', 'ring-opacity-75');
+                        setTimeout(() => {
+                            promptField.classList.remove('ring-2', 'ring-purple-400', 'ring-opacity-75');
+                        }, 1000);
+                        
+                        showStatus('Prompt melhorado com sucesso! 🚀', 'success');
+                    }, 200);
+                    
+                    // Save original prompt as data attribute
+                    promptField.dataset.originalPrompt = originalPrompt;
+                    
+                } else {
+                    showStatus(data.error || 'Erro ao melhorar prompt', 'error');
+                    promptField.style.opacity = '1';
+                }
+            } catch (error) {
+                showStatus('Erro de conexão: ' + error.message, 'error');
+                promptField.style.opacity = '1';
+            } finally {
+                enhanceBtn.disabled = false;
+                enhanceBtnText.innerHTML = '<i class="fas fa-magic mr-2"></i> Melhorar com IA';
+            }
+        }
+
+        async function generatePost() {
+            const prompt = document.getElementById('prompt').value;
+            
+            if (!prompt.trim()) {
+                showStatus('Por favor, descreva o post que deseja criar', 'error');
+                // Shake animation for prompt field
+                const promptField = document.getElementById('prompt');
+                promptField.classList.add('animate-pulse', 'border-red-500');
+                setTimeout(() => {
+                    promptField.classList.remove('animate-pulse', 'border-red-500');
+                }, 1000);
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            const generateBtnText = document.getElementById('generateBtnText');
+            const previewContainer = document.getElementById('previewContainer');
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtnText.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Gerando...';
+            previewContainer.innerHTML = `
+                <div class="text-center">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-500">Criando seu post incrível...</p>
+                    <p class="text-xs text-gray-400 mt-2">Isso pode levar alguns segundos</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        platform: selectedPlatform
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentHtml = data.html;
+                    currentContentId = data.content_id;
+                    
+                    // Show preview with fade-in effect
+                    previewContainer.style.opacity = '0';
+                    previewContainer.innerHTML = `
+                        <iframe 
+                            srcdoc="${data.html.replace(/"/g, '&quot;')}" 
+                            style="width: 100%; height: 500px; border: none; transform: scale(0.5); transform-origin: top left; width: 200%; height: 1000px;"
+                        ></iframe>
+                    `;
+                    
+                    // Fade in
+                    setTimeout(() => {
+                        previewContainer.style.transition = 'opacity 0.5s ease';
+                        previewContainer.style.opacity = '1';
+                    }, 100);
+                    
+                    // Show download options with animation
+                    const downloadOptions = document.getElementById('downloadOptions');
+                    downloadOptions.classList.remove('hidden');
+                    downloadOptions.style.animation = 'slideIn 0.5s ease';
+                    
+                    showStatus('Post gerado com sucesso! ✨', 'success');
+                    
+                    // Reset enhancement status
+                    if (isEnhanced) {
+                        document.getElementById('enhanceStatus').classList.add('hidden');
+                        isEnhanced = false;
+                    }
+                } else {
+                    showStatus(data.error || 'Erro ao gerar post', 'error');
+                    previewContainer.innerHTML = `
+                        <div class="text-center text-red-500">
+                            <i class="fas fa-exclamation-triangle text-6xl mb-4"></i>
+                            <p>Erro ao gerar preview</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                showStatus('Erro de conexão: ' + error.message, 'error');
+                previewContainer.innerHTML = `
+                    <div class="text-center text-gray-400">
+                        <i class="fas fa-wifi text-6xl mb-4"></i>
+                        <p>Erro de conexão</p>
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtnText.innerHTML = '<i class="fas fa-sparkles mr-2"></i> Gerar Post';
+            }
+        }
+
+        async function downloadPost(format) {
+            if (!currentHtml) {
+                showStatus('Gere um post primeiro', 'error');
+                return;
+            }
+
+            // Visual feedback on button click
+            event.target.classList.add('animate-pulse');
+            showStatus(`Preparando download em ${format.toUpperCase()}...`, 'info');
+
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        format: format,
+                        html: currentHtml,
+                        content_id: currentContentId,
+                        duration: format === 'mp4' ? 5 : undefined
+                    })
+                });
+
+                if (response.ok) {
+                    // Criar blob e fazer download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `post_${selectedPlatform}_${Date.now()}.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    showStatus(`Download em ${format.toUpperCase()} concluído! 🎉`, 'success');
+                } else {
+                    const error = await response.json();
+                    showStatus(error.error || 'Erro no download', 'error');
+                }
+            } catch (error) {
+                showStatus('Erro no download: ' + error.message, 'error');
+            } finally {
+                event.target.classList.remove('animate-pulse');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            const innerDiv = statusDiv.querySelector('div');
+            
+            statusDiv.classList.remove('hidden');
+            
+            // Reset classes
+            innerDiv.className = 'px-4 py-3 rounded-lg flex items-center';
+            
+            // Add type-specific classes with animations
+            statusDiv.style.animation = 'slideIn 0.3s ease';
+            
+            if (type === 'success') {
+                innerDiv.classList.add('bg-green-100', 'text-green-700');
+                innerDiv.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
+            } else if (type === 'error') {
+                innerDiv.classList.add('bg-red-100', 'text-red-700');
+                innerDiv.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i> ${message}`;
+            } else {
+                innerDiv.classList.add('bg-blue-100', 'text-blue-700');
+                innerDiv.innerHTML = `<i class="fas fa-info-circle mr-2"></i> ${message}`;
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 300);
+            }, 5000);
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to generate
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                generatePost();
+            }
+            // Ctrl/Cmd + E to enhance
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                enhancePrompt();
+            }
+        });
+
+        // Initialize
+        selectPlatform('instagram');
+        
+        // Add animations to CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateY(-20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
