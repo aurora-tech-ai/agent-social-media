@@ -298,7 +298,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 <div align="center">
   <h3>⭐ Gostou do projeto? Deixe uma estrela!</h3>
-  <p>Feito com ❤️ e muito ☕ por <a href="https://github.com/seu-usuario">Seu Nome</a></p>
+  <p>Feito com ❤️ e muito ☕ por <a href="https://github.com/seu-usuario">aurora-tech-ai</a></p>
   
   <p>
     <a href="https://github.com/seu-usuario/social-media-ai-generator/issues">🐛 Reportar Bug</a> •
